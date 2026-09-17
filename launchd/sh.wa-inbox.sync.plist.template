@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>sh.wa-inbox.sync</string>
+  <key>ProgramArguments</key><array>
+    <string>__WACLI__</string><string>sync</string><string>--follow</string>
+    <string>--presence-mode</string><string>quiet</string>
+    <string>--max-reconnect</string><string>0</string>
+    <string>--max-db-size</string><string>500MB</string>
+    <string>--download-media</string>
+    <string>--refresh-contacts</string>
+    <string>--refresh-groups</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>30</integer>
+  <key>StandardOutPath</key><string>__LOGS__/sync.out.log</string>
+  <key>StandardErrorPath</key><string>__LOGS__/sync.err.log</string>
+  <key>EnvironmentVariables</key><dict>
+    <key>HOME</key><string>__HOME__</string>
+    <key>PATH</key><string>__PATH__</string>
+  </dict>
+</dict></plist>

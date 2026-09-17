@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "properties": {
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "message_id": {
+            "type": "string"
+          },
+          "create": {
+            "type": "boolean"
+          },
+          "list": {
+            "type": "string",
+            "description": "exact name of an existing list, or \"\" to use the default list"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "notes": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "grouped_message_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "ids of other messages folded into this task (photos included), [] otherwise"
+          }
+        },
+        "required": [
+          "message_id",
+          "create",
+          "list",
+          "title",
+          "notes",
+          "reason",
+          "grouped_message_ids"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "decisions"
+  ],
+  "additionalProperties": false
+}

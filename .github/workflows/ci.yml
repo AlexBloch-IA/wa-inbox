@@ -1,0 +1,43 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install pytest ruff
+      - run: ruff check .
+      - run: pytest -q
+      - name: installer is valid shell
+        run: bash -n install.sh
+      - name: launchd templates are valid plists
+        run: |
+          for f in launchd/*.template; do
+            sed -e 's|__HOME__|/Users/ci|g' -e 's|__REPO__|/tmp/repo|g' -e 's|__LOGS__|/tmp/logs|g' \
+                -e 's|__PYTHON__|/usr/bin/python3|g' -e 's|__WACLI__|/usr/local/bin/wacli|g' \
+                -e 's|__PATH__|/usr/bin:/bin|g' "$f" > /tmp/out.plist
+            plutil -lint /tmp/out.plist
+          done
+      - name: no WhatsApp write command may enter the codebase
+        run: |
+          # The runner must stay read-only. The sync daemon and `wacli auth` in the
+          # installer are the only allowed live connections, so they are excluded.
+          if grep -rnE 'mark-read|mark_read|wacli (send|presence)|"(send|presence)"' \
+               --include='*.py' --include='*.template' --include='*.sh' . \
+               | grep -v 'install.sh:.*wacli auth' | grep -v '^\./docs/'; then
+            echo "A WhatsApp write command appeared. This tool is read-only by design."; exit 1
+          fi
+      - name: the classifier must never run with tools available
+        run: |
+          grep -q '"--restricted"' wa_inbox/classify.py || { echo "classifier lost --restricted"; exit 1; }
+          grep -q '"--strict-mcp-config"' wa_inbox/classify.py || { echo "classifier lost --strict-mcp-config"; exit 1; }
