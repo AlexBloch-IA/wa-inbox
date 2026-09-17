@@ -30,11 +30,11 @@ jobs:
           done
       - name: no WhatsApp write command may enter the codebase
         run: |
-          # The runner must stay read-only. The sync daemon and `wacli auth` in the
-          # installer are the only allowed live connections, so they are excluded.
-          if grep -rnE 'mark-read|mark_read|wacli (send|presence)|"(send|presence)"' \
-               --include='*.py' --include='*.template' --include='*.sh' . \
-               | grep -v 'install.sh:.*wacli auth' | grep -v '^\./docs/'; then
+          # The runner must stay read-only. Match how a command is actually issued
+          # (a quoted argument, a plist <string>, a shell invocation) rather than
+          # the words themselves, so prose explaining the rule does not trip it.
+          if grep -rnE '"(mark-read|mark_read|send|presence)"|<string>(send|presence|mark-read)</string>|wacli +(send|presence)|wacli +chats +mark-(read|unread)' \
+               --include='*.py' --include='*.template' --include='*.sh' .; then
             echo "A WhatsApp write command appeared. This tool is read-only by design."; exit 1
           fi
       - name: the classifier must never run with tools available
